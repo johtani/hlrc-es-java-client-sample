@@ -1,4 +1,4 @@
-package info.johtani.sample.es.client;
+package info.johtani.sample.es.client.search;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -39,10 +39,10 @@ public class EsSearchRequest {
     }
 
     // たぶん、builderとかにして外に出すのがよさそう
-    public SearchRequest buildEsSearchResult(EsSearchRequest request) {
+    public SearchRequest buildEsSearchResult() {
         SearchRequest esRequest = new SearchRequest();
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        MatchQueryBuilder queryBuilder = new MatchQueryBuilder(request.getFieldName(), request.getSearchText());
+        MatchQueryBuilder queryBuilder = new MatchQueryBuilder(getFieldName(), getSearchText());
         //query
         builder.query(queryBuilder);
         // TODO aggs

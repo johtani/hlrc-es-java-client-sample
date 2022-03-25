@@ -1,5 +1,7 @@
-package info.johtani.sample.es.client;
+package info.johtani.sample.es.client.search;
 
+import info.johtani.sample.es.client.Logger;
+import info.johtani.sample.es.client.WikiDocument;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
