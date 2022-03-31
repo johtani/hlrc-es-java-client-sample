@@ -9,6 +9,10 @@ public class WikiDocument {
     private List<String> categories;
     private List<String> headings;
     private String revision_id;
+    private String url;
+
+    public WikiDocument() {
+    }
 
     public WikiDocument(String id, String title) {
         this.id = id;
@@ -53,6 +57,14 @@ public class WikiDocument {
 
     public void setRevision_id(String revision_id) {
         this.revision_id = revision_id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public void printDoc() {
