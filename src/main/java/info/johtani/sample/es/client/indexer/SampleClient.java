@@ -1,7 +1,6 @@
 package info.johtani.sample.es.client.indexer;
 
 import info.johtani.sample.es.client.Logger;
-import info.johtani.sample.es.client.search.EsService;
 
 import java.io.IOException;
 

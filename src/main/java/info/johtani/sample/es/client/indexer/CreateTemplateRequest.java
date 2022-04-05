@@ -3,8 +3,11 @@ package info.johtani.sample.es.client.indexer;
 import org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
 import org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
 import org.elasticsearch.cluster.metadata.Template;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,11 +38,11 @@ public class CreateTemplateRequest {
         Settings.Builder settings = this.buildSettings();
 
         // mappings
-        String mappings = WikipediaMappings.mappingJson;
+        XContentBuilder mappings = buildMappings();
 
         Template template = new Template(
                 settings.build(),
-                new CompressedXContent(mappings),
+                new CompressedXContent(BytesReference.bytes(mappings)),
                 null
         );
         ComposableIndexTemplate indexTemplate = new ComposableIndexTemplate(
@@ -50,106 +53,180 @@ public class CreateTemplateRequest {
     }
 
     private Settings.Builder buildSettings() {
-        Settings.Builder builder = Settings.builder();
-
+        Settings.Builder builder = Settings.builder()
+                .put("index.number_of_replicas", "0")
+                .put("index.number_of_shards", "3")
+                .put("index.refresh_interval", "0")
+                ;
         return builder;
     }
 
-}
+    private XContentBuilder buildMappings() throws IOException {
+        XContentBuilder builder = XContentFactory.jsonBuilder();
+        builder.startObject();
+        {
+            builder.startObject("properties");
+            {
+                builder.startObject("id");
+                {
+                    builder.field("type", "keyword");
+                }
+                builder.endObject();
 
-class WikipediaMappings {
+                builder.startObject("revision_id");
+                {
+                    builder.field("type", "keyword");
+                }
+                builder.endObject();
 
-    static String mappingJson = "{\n" +
-            "      \"properties\" : {\n" +
-            "        \"id\" : {\n" +
-            "          \"type\" : \"keyword\"\n" +
-            "        },\n" +
-            "        \"revision_id\": {\n" +
-            "          \"type\": \"keyword\"\n" +
-            "        },\n" +
-            "        \"timestamp\": {\n" +
-            "          \"type\": \"date\"\n" +
-            "        },\n" +
-            "        \"title\" : {\n" +
-            "          \"type\" : \"text\",\n" +
-            "          \"analyzer\": \"kuromoji\",\n" +
-            "          \"fields\" : {\n" +
-            "            \"keyword\" : {\n" +
-            "              \"type\" : \"keyword\",\n" +
-            "              \"ignore_above\" : 256\n" +
-            "            }\n" +
-            "          }\n" +
-            "        },\n" +
-            "        \"headings\" : {\n" +
-            "          \"type\" : \"text\",\n" +
-            "          \"analyzer\": \"kuromoji\",\n" +
-            "          \"fields\" : {\n" +
-            "            \"keyword\" : {\n" +
-            "              \"type\" : \"keyword\",\n" +
-            "              \"ignore_above\" : 256\n" +
-            "            }\n" +
-            "          }\n" +
-            "        },\n" +
-            "        \"categories\" : {\n" +
-            "          \"type\" : \"keyword\"\n" +
-            "        },\n" +
-            "        \"contents\" : {\n" +
-            "          \"type\" : \"text\",\n" +
-            "          \"analyzer\": \"kuromoji\",\n" +
-            "          \"fields\" : {\n" +
-            "            \"keyword\" : {\n" +
-            "              \"type\" : \"keyword\",\n" +
-            "              \"ignore_above\" : 256\n" +
-            "            }\n" +
-            "          }\n" +
-            "        },\n" +
-            "        \"images\": {\n" +
-            "          \"type\": \"nested\",\n" +
-            "           \"properties\": {\n" +
-            "             \"taget\": {\n" +
-            "               \"type\": \"keyword\"\n" +
-            "             },\n" +
-            "             \"target_type\": {\n" +
-            "               \"type\": \"keyword\"\n" +
-            "             },\n" +
-            "             \"text\": {\n" +
-            "               \"type\": \"nested\",\n" +
-            "               \"properties\": {\n" +
-            "                 \"text\": {\n" +
-            "                   \"type\" : \"text\",\n" +
-            "                   \"analyzer\": \"kuromoji\",\n" +
-            "                   \"fields\" : {\n" +
-            "                     \"keyword\" : {\n" +
-            "                       \"type\" : \"keyword\",\n" +
-            "                       \"ignore_above\" : 256\n" +
-            "                     }\n" +
-            "                   }\n" +
-            "                 },\n" +
-            "                 \"link_target\": {\n" +
-            "                   \"type\": \"keyword\"\n" +
-            "                 }\n" +
-            "               }\n" +
-            "             }\n" +
-            "           }\n" +
-            "        },\n" +
-            "        \"links\": {\n" +
-            "          \"type\": \"nested\",\n" +
-            "          \"properties\": {\n" +
-            "            \"text\": {\n" +
-            "              \"type\" : \"text\",\n" +
-            "              \"analyzer\": \"kuromoji\",\n" +
-            "              \"fields\" : {\n" +
-            "                \"keyword\" : {\n" +
-            "                  \"type\" : \"keyword\",\n" +
-            "                  \"ignore_above\" : 256\n" +
-            "                }\n" +
-            "              }\n" +
-            "            },\n" +
-            "            \"link_target\": {\n" +
-            "              \"type\": \"keyword\"\n" +
-            "            }\n" +
-            "          }\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }";
+                builder.startObject("timestamp");
+                {
+                    builder.field("type", "date");
+                }
+                builder.endObject();
+
+                builder.startObject("title");
+                {
+                    builder.field("type", "text");
+                    builder.field("analyzer", "kuromoji");
+                    builder.startObject("fields");
+                    {
+                        builder.startObject("keyword");
+                        {
+                            builder.field("type", "keyword");
+                            builder.field("ignore_above", "256");
+                        }
+                        builder.endObject();
+                    }
+                    builder.endObject();
+                }
+                builder.endObject();
+
+                builder.startObject("headings");
+                {
+                    builder.field("type", "text");
+                    builder.field("analyzer", "kuromoji");
+                    builder.startObject("fields");
+                    {
+                        builder.startObject("keyword");
+                        {
+                            builder.field("type", "keyword");
+                            builder.field("ignore_above", "256");
+                        }
+                        builder.endObject();
+                    }
+                    builder.endObject();
+                }
+                builder.endObject();
+
+                builder.startObject("categories");
+                {
+                    builder.field("type", "keyword");
+                }
+                builder.endObject();
+
+                builder.startObject("contents");
+                {
+                    builder.field("type", "text");
+                    builder.field("analyzer", "kuromoji");
+                    builder.startObject("fields");
+                    {
+                        builder.startObject("keyword");
+                        {
+                            builder.field("type", "keyword");
+                            builder.field("ignore_above", "256");
+                        }
+                        builder.endObject();
+                    }
+                    builder.endObject();
+                }
+                builder.endObject();
+
+                builder.startObject("images");
+                {
+                    builder.field("type", "nested");
+                    builder.startObject("properties");
+                    {
+                        builder.startObject("taget");
+                        {
+                            builder.field("type", "keyword");
+                        }
+                        builder.endObject();
+                        builder.startObject("target_type");
+                        {
+                            builder.field("type", "keyword");
+                        }
+                        builder.endObject();
+                        builder.startObject("text");
+                        {
+                            builder.field("type", "nested");
+                            builder.startObject("properties");
+                            {
+                                builder.startObject("text");
+                                {
+                                    builder.field("type", "text");
+                                    builder.field("analyzer", "kuromoji");
+                                    builder.startObject("fields");
+                                    {
+                                        builder.startObject("keyword");
+                                        {
+                                            builder.field("type", "keyword");
+                                            builder.field("ignore_above", "256");
+                                        }
+                                        builder.endObject();
+                                    }
+                                    builder.endObject();
+                                }
+                                builder.endObject();
+                                builder.startObject("link_target");
+                                {
+                                    builder.field("type", "keyword");
+                                }
+                                builder.endObject();
+                            }
+                            builder.endObject();
+                        }
+                        builder.endObject();
+                    }
+                    builder.endObject();
+                }
+                builder.endObject();
+
+                builder.startObject("links");
+                {
+                    builder.field("type", "nested");
+                    builder.startObject("properties");
+                    {
+                        builder.startObject("text");
+                        {
+                            builder.field("type", "text");
+                            builder.field("analyzer", "kuromoji");
+                            builder.startObject("fields");
+                            {
+                                builder.startObject("keyword");
+                                {
+                                    builder.field("type", "keyword");
+                                    builder.field("ignore_above", "256");
+                                }
+                                builder.endObject();
+                            }
+                            builder.endObject();
+                        }
+                        builder.endObject();
+
+                        builder.startObject("link_target");
+                        {
+                            builder.field("type", "keyword");
+                        }
+                        builder.endObject();
+                    }
+                    builder.endObject();
+                }
+                builder.endObject();
+            }
+            builder.endObject();
+        }
+        builder.endObject();
+        return builder;
+    }
 }

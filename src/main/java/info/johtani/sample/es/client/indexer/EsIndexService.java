@@ -55,7 +55,7 @@ public class EsIndexService extends AbstractEsService {
     public IndexResult bulkIndex(List<WikiDocument> docs, String indexName) throws IOException{
         IndexResult result = new IndexResult();
         BulkRequest request = new BulkRequest();
-        request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
+        request.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
         for (WikiDocument doc : docs) {
             // TODO とりあえず、登録処理だけ
             request.add(new IndexRequest(indexName).id(doc.getId()).source(toJsonString(doc), XContentType.JSON));
@@ -64,7 +64,7 @@ public class EsIndexService extends AbstractEsService {
             BulkResponse res = client.bulk(request, RequestOptions.DEFAULT);
             // FIXME error check
             result.setError(res.hasFailures());
-            if (res.hasFailures()) {
+            if (result.isError()) {
                 Logger.log("Bulk indexing has some failures");
                 // Easy way to write a combined message
                 Logger.log(res.buildFailureMessage());
