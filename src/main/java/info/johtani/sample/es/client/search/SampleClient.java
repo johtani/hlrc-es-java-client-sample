@@ -1,9 +1,6 @@
 package info.johtani.sample.es.client.search;
 
 import info.johtani.sample.es.client.Logger;
-import info.johtani.sample.es.client.search.EsSearchRequest;
-import info.johtani.sample.es.client.search.EsSearchResult;
-import info.johtani.sample.es.client.search.EsService;
 
 public class SampleClient {
 

@@ -1,12 +1,8 @@
 package info.johtani.sample.es.client.search;
 
 import info.johtani.sample.es.client.AbstractEsService;
-import org.apache.http.HttpHost;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.rest.RestStatus;
 
 import java.io.IOException;

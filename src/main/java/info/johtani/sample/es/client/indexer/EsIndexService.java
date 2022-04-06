@@ -1,7 +1,6 @@
 package info.johtani.sample.es.client.indexer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import info.johtani.sample.es.client.AbstractEsService;
 import info.johtani.sample.es.client.Logger;
